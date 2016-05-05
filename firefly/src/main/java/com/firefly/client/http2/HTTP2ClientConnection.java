@@ -60,6 +60,11 @@ public class HTTP2ClientConnection extends AbstractHTTP2Connection implements HT
 				}
 				promise.failed(x);
 			}
+
+			@Override
+			public boolean isNonBlocking() {
+				return false;
+			}
 		};
 
 		if (windowDelta > 0) {

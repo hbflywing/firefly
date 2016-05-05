@@ -23,6 +23,9 @@ import com.firefly.codec.http2.stream.HTTP2Configuration;
 import com.firefly.codec.http2.stream.HTTPConnection;
 import com.firefly.codec.http2.stream.HTTPOutputStream;
 import com.firefly.utils.concurrent.FuturePromise;
+import com.firefly.utils.function.Action6;
+import com.firefly.utils.function.Func4;
+import com.firefly.utils.function.Func5;
 import com.firefly.utils.io.BufferUtils;
 import com.firefly.utils.log.Log;
 import com.firefly.utils.log.LogFactory;
@@ -82,14 +85,31 @@ public class HTTP2ClientTLSDemo2 {
 			httpConnection.send(
 					new MetaData.Request("GET", HttpScheme.HTTP, new HostPortHttpField("127.0.0.1:6677"), "/index",
 							HttpVersion.HTTP_1_1, fields),
-					new ClientHTTPHandler.Adapter().messageComplete((req, resp, outputStream, conn) -> {
-						System.out.println("message complete: " + resp.getStatus() + "|" + resp.getReason());
-						return true;
-					}).content((buffer, req, resp, outputStream, conn) -> {
-						System.out.println(BufferUtils.toString(buffer, StandardCharsets.UTF_8));
-						return false;
-					}).badMessage((errCode, reason, req, resp, outputStream, conn) -> {
-						System.out.println("error: " + errCode + "|" + reason);
+					new ClientHTTPHandler.Adapter().messageComplete(new Func4<Request, Response, HTTPOutputStream, HTTPConnection, Boolean>(){
+
+						@Override
+						public Boolean call(Request t1, Response resp, HTTPOutputStream t3, HTTPConnection t4) {
+							System.out.println("message complete: " + resp.getStatus() + "|" + resp.getReason());
+							return true;
+						}
+						
+					}).content(new Func5<ByteBuffer, Request, Response, HTTPOutputStream, HTTPConnection, Boolean>() {
+
+						@Override
+						public Boolean call(ByteBuffer buffer, Request t2, Response t3, HTTPOutputStream t4,
+								HTTPConnection t5) {
+							System.out.println(BufferUtils.toString(buffer, StandardCharsets.UTF_8));
+							return false;
+						}
+						
+					}).badMessage(new Action6<Integer, String, Request, Response, HTTPOutputStream, HTTPConnection>() {
+
+						@Override
+						public void call(Integer errCode, String reason, Request t3, Response t4, HTTPOutputStream t5,
+								HTTPConnection t6) {
+							System.out.println("error: " + errCode + "|" + reason);
+						}
+						
 					}));
 		}
 	}

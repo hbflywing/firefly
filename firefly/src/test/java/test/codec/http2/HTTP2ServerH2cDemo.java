@@ -64,6 +64,11 @@ public class HTTP2ServerH2cDemo {
 									public void failed(Throwable x) {
 										x.printStackTrace();
 									}
+
+									@Override
+									public boolean isNonBlocking() {
+										return false;
+									}
 								});
 								System.out.println("server response");
 							} else if (uri.getPath().equals("/data")) {
@@ -97,6 +102,11 @@ public class HTTP2ServerH2cDemo {
 										@Override
 										public void failed(Throwable x) {
 											x.printStackTrace();
+										}
+
+										@Override
+										public boolean isNonBlocking() {
+											return false;
 										}
 									});
 								}

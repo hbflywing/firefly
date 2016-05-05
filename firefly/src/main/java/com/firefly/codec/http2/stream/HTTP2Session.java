@@ -144,6 +144,11 @@ public abstract class HTTP2Session implements SessionSPI, Parser.Listener {
 						// session flow control window for other streams.
 						flowControl.onDataConsumed(HTTP2Session.this, stream, flowControlLength);
 					}
+
+					@Override
+					public boolean isNonBlocking() {
+						return false;
+					}
 				});
 			}
 		} else {
@@ -303,6 +308,11 @@ public abstract class HTTP2Session implements SessionSPI, Parser.Listener {
 						@Override
 						public void failed(Throwable x) {
 							notifyClose(HTTP2Session.this, frame);
+						}
+
+						@Override
+						public boolean isNonBlocking() {
+							return false;
 						}
 					}, new DisconnectFrame());
 					return;
@@ -1019,6 +1029,11 @@ public abstract class HTTP2Session implements SessionSPI, Parser.Listener {
 		@Override
 		public void failed(Throwable x) {
 			promise.failed(x);
+		}
+
+		@Override
+		public boolean isNonBlocking() {
+			return false;
 		}
 	}
 }

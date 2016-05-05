@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>firefly-common</artifactId>
+	<artifactId>firefly-common-jdk7</artifactId>
 	<packaging>jar</packaging>
 	
 	<name>firefly-common</name>
@@ -10,8 +10,8 @@
 	
 	<parent>
 	    <groupId>com.fireflysource</groupId>
-	    <artifactId>firefly-framework</artifactId>
-	    <version>4.0.1-SNAPSHOT</version>
+	    <artifactId>firefly-framework-jdk7</artifactId>
+	    <version>4.0.1.1</version>
 	    <relativePath>../pom.xml</relativePath>
 	</parent>
 	

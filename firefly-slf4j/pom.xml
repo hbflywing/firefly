@@ -5,12 +5,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.fireflysource</groupId>
-		<artifactId>firefly-framework</artifactId>
-		<version>4.0.1-SNAPSHOT</version>
+		<artifactId>firefly-framework-jdk7</artifactId>
+		<version>4.0.1.1</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
-	<artifactId>firefly-slf4j</artifactId>
+	<artifactId>firefly-slf4j-jdk7</artifactId>
 	<packaging>jar</packaging>
 
 	<name>firefly-slf4j</name>
@@ -36,7 +36,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.fireflysource</groupId>
-			<artifactId>firefly-common</artifactId>
+			<artifactId>firefly-common-jdk7</artifactId>
 		</dependency>
 		
 		<dependency>

@@ -12,6 +12,7 @@ import com.firefly.utils.classproxy.ArrayProxyFactoryUsingJavassist;
 import com.firefly.utils.classproxy.FieldProxyFactoryUsingJavassist;
 import com.firefly.utils.classproxy.MethodProxyFactoryUsingJavassist;
 import com.firefly.utils.collection.ConcurrentReferenceHashMap;
+import com.firefly.utils.function.Func1;
 
 public abstract class ReflectUtils {
 
@@ -170,7 +171,12 @@ public abstract class ReflectUtils {
 	}
 
 	public static Map<String, Method> getSetterMethods(Class<?> clazz) {
-		return setterCache.get(clazz, (key) -> { return getSetterMethods(key, null);});
+		return setterCache.get(clazz, new Func1<Class<?>, Map<String, Method>>(){
+
+			@Override
+			public Map<String, Method> call(Class<?> key) {
+				return getSetterMethods(key, null);
+			}});
 	}
 
 	public static Map<String, Method> getSetterMethods(Class<?> clazz, BeanMethodFilter filter) {
@@ -198,7 +204,12 @@ public abstract class ReflectUtils {
 	}
 
 	public static Map<String, Method> getGetterMethods(Class<?> clazz) {
-		return getterCache.get(clazz, (key) -> { return getGetterMethods(key, null);});
+		return getterCache.get(clazz, new Func1<Class<?>, Map<String, Method>>(){
+
+			@Override
+			public Map<String, Method> call(Class<?> key) {  
+				return getGetterMethods(key, null);
+			}});
 	}
 
 	public static Map<String, Method> getGetterMethods(Class<?> clazz, BeanMethodFilter filter) {
@@ -234,7 +245,12 @@ public abstract class ReflectUtils {
 	}
 
 	public static Map<String, Field> getFields(Class<?> clazz) {
-		return propertyCache.get(clazz, (key) -> { return getFields(key, null);});
+		return propertyCache.get(clazz, new Func1<Class<?>, Map<String, Field>>(){
+
+			@Override
+			public Map<String, Field> call(Class<?> key) {  
+				return getFields(key, null);
+			}});
 	}
 
 	public static Map<String, Field> getFields(Class<?> clazz, BeanFieldFilter filter) {

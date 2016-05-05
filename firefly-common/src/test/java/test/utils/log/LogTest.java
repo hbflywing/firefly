@@ -117,14 +117,23 @@ public class LogTest {
 			e1.printStackTrace();
 		}
 		try {
-			FileUtils.read(getFile(logFoo), (text, num) -> {
-				String[] data = StringUtils.split(text, '\t');
-				Assert.assertEquals("testFoo", data[1]);
+			FileUtils.read(getFile(logFoo), new LineReaderHandler(){
+
+				@Override
+				public void readline(String text, int num) {
+					String[] data = StringUtils.split(text, '\t');
+					Assert.assertEquals("testFoo", data[1]);
+				}
 			}, "utf-8");
 			
-			FileUtils.read(getFile(logBar), (text, num) -> {
-				String[] data = StringUtils.split(text, '\t');
-				Assert.assertEquals("testBar", data[1]);
+			FileUtils.read(getFile(logBar), new LineReaderHandler(){
+
+				@Override
+				public void readline(String text, int num) {
+					String[] data = StringUtils.split(text, '\t');
+					Assert.assertEquals("testBar", data[1]);
+				}
+				
 			}, "utf-8");
 			
 			// test trace

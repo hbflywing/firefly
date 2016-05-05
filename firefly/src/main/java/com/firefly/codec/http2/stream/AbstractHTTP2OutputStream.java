@@ -277,6 +277,11 @@ abstract public class AbstractHTTP2OutputStream extends HTTPOutputStream {
 			}
 		}
 
+		@Override
+		public boolean isNonBlocking() {
+			return false;
+		}
+
 	}
 
 	abstract protected Stream getStream();

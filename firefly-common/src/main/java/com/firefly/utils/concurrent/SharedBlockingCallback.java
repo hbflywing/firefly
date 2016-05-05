@@ -95,7 +95,7 @@ public class SharedBlockingCallback {
 	 * not blocak, rather they wakeup the thread that is blocked in
 	 * {@link #block()}
 	 */
-	public class Blocker implements Callback.NonBlocking, Closeable {
+	public class Blocker extends Callback.NonBlocking implements Closeable {
 		private Throwable _state = IDLE;
 
 		protected Blocker() {

@@ -182,7 +182,9 @@ public class HTTP2Flusher extends IteratingCallback {
 	private void complete() {
 		buffers.clear();
 
-		actives.forEach(Entry::complete);
+		for(Entry entry : actives) {
+			entry.complete();
+		}
 
 		if (stalled != null) {
 			// We have written part of the frame, but there is more to write.
@@ -225,7 +227,9 @@ public class HTTP2Flusher extends IteratingCallback {
 			frames.clear();
 		}
 
-		actives.forEach(entry -> entry.failed(x));
+		for(Entry entry : actives) {
+			entry.failed(x);
+		}
 		actives.clear();
 
 		// If the failure came from within the
@@ -319,6 +323,11 @@ public class HTTP2Flusher extends IteratingCallback {
 			FlowControlStrategy flowControl = session.getFlowControlStrategy();
 			flowControl.onWindowUpdate(session, stream, frame);
 		}
+	}
+
+	@Override
+	public boolean isNonBlocking() {
+		return false;
 	}
 
 }

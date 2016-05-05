@@ -28,6 +28,7 @@ import com.firefly.utils.Assert;
 import com.firefly.utils.ReflectUtils;
 import com.firefly.utils.StringUtils;
 import com.firefly.utils.collection.ConcurrentReferenceHashMap;
+import com.firefly.utils.function.Func1;
 
 public class DefaultBeanProcessor extends BeanProcessor {
 
@@ -83,8 +84,13 @@ public class DefaultBeanProcessor extends BeanProcessor {
 	}
 
 	public SQLMapper generateDeleteSQL(Class<?> t) {
-		return deleteCache.get(t, (key) -> {
-			return _generateDeleteSQL(key);
+		return deleteCache.get(t, new Func1<Class<?>, SQLMapper>() {
+
+			@Override
+			public SQLMapper call(Class<?> key) {
+				return _generateDeleteSQL(key);
+			}
+
 		});
 	}
 
@@ -100,20 +106,24 @@ public class DefaultBeanProcessor extends BeanProcessor {
 	}
 
 	public SQLMapper generateQuerySQL(Class<?> t) {
-		return queryCache.get(t, (key) -> {
-			return _generateQuerySQL(key);
+		return queryCache.get(t, new Func1<Class<?>, SQLMapper>() {
+			@Override
+			public SQLMapper call(Class<?> key) {
+				return _generateQuerySQL(key);
+			}
 		});
 	}
 
 	protected SQLMapper _generateQuerySQL(Class<?> t) {
 		SQLMapper sqlMapper = new SQLMapper();
-		StringBuilder sql = new StringBuilder();
+		final StringBuilder sql = new StringBuilder();
 
 		sql.append("select");
 		Map<String, Mapper> m = getMapper(t);
-		m.forEach((property, mapper) -> {
+		for (Map.Entry<String, Mapper> entry : m.entrySet()) {
+			Mapper mapper = entry.getValue();
 			sql.append(" ").append(mapper.columnName).append(",");
-		});
+		}
 		sql.deleteCharAt(sql.length() - 1);
 
 		String tableName = getTableName(t);
@@ -129,7 +139,8 @@ public class DefaultBeanProcessor extends BeanProcessor {
 		StringBuilder sql = new StringBuilder();
 		Map<String, Mapper> m = getMapper(t);
 		List<Mapper> mapperList = new ArrayList<>();
-		m.forEach((property, mapper) -> {
+		for (Map.Entry<String, Mapper> entry : m.entrySet()) {
+			Mapper mapper = entry.getValue();
 			if (!mapper.autoIncrement) {
 				try {
 					Object value = ReflectUtils.get(object, mapper.propertyName);
@@ -139,7 +150,7 @@ public class DefaultBeanProcessor extends BeanProcessor {
 				} catch (Throwable e) {
 				}
 			}
-		});
+		}
 
 		Map<String, Integer> propertyMap = new HashMap<>();
 		String tableName = getTableName(t);
@@ -166,8 +177,13 @@ public class DefaultBeanProcessor extends BeanProcessor {
 	}
 
 	public SQLMapper generateInsertSQL(Class<?> t) {
-		return insertCache.get(t, (key) -> {
-			return _generateInsertSQL(key);
+		return insertCache.get(t, new Func1<Class<?>, SQLMapper>() {
+
+			@Override
+			public SQLMapper call(Class<?> key) {
+				return _generateInsertSQL(key);
+			}
+
 		});
 	}
 
@@ -176,11 +192,12 @@ public class DefaultBeanProcessor extends BeanProcessor {
 		StringBuilder sql = new StringBuilder();
 		Map<String, Mapper> m = getMapper(t);
 		List<Mapper> mapperList = new ArrayList<>();
-		m.forEach((property, mapper) -> {
+		for (Map.Entry<String, Mapper> entry : m.entrySet()) {
+			Mapper mapper = entry.getValue();
 			if (!mapper.autoIncrement) {
 				mapperList.add(mapper);
 			}
-		});
+		}
 
 		Map<String, Integer> propertyMap = new HashMap<>();
 		String tableName = getTableName(t);
@@ -248,8 +265,13 @@ public class DefaultBeanProcessor extends BeanProcessor {
 	}
 
 	public Map<String, Mapper> getMapper(Class<?> t) {
-		return mapperCache.get(t, (clazz) -> {
-			return _getMapper(clazz);
+		return mapperCache.get(t, new Func1<Class<?>, Map<String, Mapper>>() {
+
+			@Override
+			public Map<String, Mapper> call(Class<?> key) {
+				return _getMapper(key);
+			}
+
 		});
 	}
 
@@ -257,16 +279,19 @@ public class DefaultBeanProcessor extends BeanProcessor {
 		Map<String, Mapper> ret = new HashMap<>();
 		Map<String, Method> getterMethodMap = ReflectUtils.getGetterMethods(t);
 		Map<String, Method> setterMethodMap = ReflectUtils.getSetterMethods(t);
-		Set<String> properties = new HashSet<>();
+		final Set<String> properties = new HashSet<>();
 
-		getterMethodMap.forEach((property, method) -> {
+		for (Map.Entry<String, Method> entry : getterMethodMap.entrySet()) {
+			String property = entry.getKey();
 			properties.add(property);
-		});
-		setterMethodMap.forEach((property, method) -> {
-			properties.add(property);
-		});
+		}
 
-		properties.forEach((property) -> {
+		for (Map.Entry<String, Method> entry : setterMethodMap.entrySet()) {
+			String property = entry.getKey();
+			properties.add(property);
+		}
+
+		for (String property : properties) {
 			Mapper mapper = new Mapper();
 			mapper.propertyName = property;
 
@@ -353,7 +378,8 @@ public class DefaultBeanProcessor extends BeanProcessor {
 			}
 
 			ret.put(property, mapper);
-		});
+		}
+		;
 
 		return ret;
 	}
@@ -477,6 +503,7 @@ public class DefaultBeanProcessor extends BeanProcessor {
 	 * @throws SQLException
 	 *             if an error occurs setting the property.
 	 */
+	@SuppressWarnings("unchecked")
 	private void callSetter(Object target, PropertyDescriptor prop, Object value) throws SQLException {
 
 		Method setter = prop.getWriteMethod();

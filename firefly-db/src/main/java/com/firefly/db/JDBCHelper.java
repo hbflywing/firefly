@@ -19,6 +19,8 @@ import com.firefly.db.DefaultBeanProcessor.Mapper;
 import com.firefly.db.DefaultBeanProcessor.SQLMapper;
 import com.firefly.utils.Assert;
 import com.firefly.utils.ReflectUtils;
+import com.firefly.utils.ReflectUtils.MethodProxy;
+import com.firefly.utils.classproxy.ClassProxy;
 import com.firefly.utils.classproxy.ClassProxyFactoryUsingJavassist;
 import com.firefly.utils.function.Func2;
 import com.firefly.utils.log.Log;
@@ -38,28 +40,31 @@ public class JDBCHelper {
 			QueryRunner queryRunner = new QueryRunner(dataSource);
 			try {
 				this.runner = (QueryRunner) ClassProxyFactoryUsingJavassist.INSTANCE.createProxy(queryRunner,
-						(handler, originalInstance, args) -> {
+						new ClassProxy() {
+							@Override
+							public Object intercept(MethodProxy handler, Object originalInstance, Object[] args) {
 
-							if (args != null && args.length > 0) {
-								String sql = null;
-								String params = null;
-								for (int i = 0; i < args.length; i++) {
-									Object arg = args[i];
-									if (arg instanceof String) {
-										sql = (String) arg;
-									}
+								if (args != null && args.length > 0) {
+									String sql = null;
+									String params = null;
+									for (int i = 0; i < args.length; i++) {
+										Object arg = args[i];
+										if (arg instanceof String) {
+											sql = (String) arg;
+										}
 
-									if (arg instanceof Object[]) {
-										params = Arrays.toString((Object[]) arg);
+										if (arg instanceof Object[]) {
+											params = Arrays.toString((Object[]) arg);
+										}
 									}
+									log.debug("the method {} will execute SQL [ {} | {} ]", handler.method().getName(),
+											sql, params);
 								}
-								log.debug("the method {} will execute SQL [ {} | {} ]", handler.method().getName(), sql,
-										params);
-							}
 
-							Object ret = handler.invoke(originalInstance, args);
-							return ret;
-						} , null);
+								Object ret = handler.invoke(originalInstance, args);
+								return ret;
+							}
+						}, null);
 			} catch (Throwable t) {
 				this.runner = new QueryRunner(dataSource);
 				log.error("create QueryRunner proxy exception", t);
@@ -232,13 +237,16 @@ public class JDBCHelper {
 		Assert.notEmpty(sqlMapper.propertyMap, "the property map must not be empty");
 
 		Object[] params = new Object[sqlMapper.propertyMap.size()];
-		sqlMapper.propertyMap.forEach((property, index) -> {
+		for (Map.Entry<String, Integer> entry : sqlMapper.propertyMap.entrySet()) {
+			String property = entry.getKey();
+			Integer index = entry.getValue();
+
 			try {
 				Object value = ReflectUtils.get(object, property);
 				params[index] = value;
 			} catch (Throwable e) {
 			}
-		});
+		}
 		return this.update(connection, sqlMapper.sql, params);
 	}
 
@@ -277,13 +285,16 @@ public class JDBCHelper {
 		Assert.notEmpty(sqlMapper.propertyMap, "the property map must not be empty");
 
 		Object[] params = new Object[sqlMapper.propertyMap.size()];
-		sqlMapper.propertyMap.forEach((property, index) -> {
+		for (Map.Entry<String, Integer> entry : sqlMapper.propertyMap.entrySet()) {
+			String property = entry.getKey();
+			Integer index = entry.getValue();
+
 			try {
 				Object value = ReflectUtils.get(object, property);
 				params[index] = value;
 			} catch (Throwable e) {
 			}
-		});
+		}
 		T ret = this.insert(connection, sqlMapper.sql, params);
 		if (ret != null) {
 			Mapper idMapper = defaultBeanProcessor.getIdMapper(t);

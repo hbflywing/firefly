@@ -159,12 +159,22 @@ public class HTTP2ClientDemo {
 					public void failed(Throwable x) {
 						log.info("client sents big data failure");
 					}
+
+					@Override
+					public boolean isNonBlocking() {
+						return false;
+					}
 				});
 			}
 
 			@Override
 			public void failed(Throwable x) {
 				log.info("client sents small data failure");
+			}
+
+			@Override
+			public boolean isNonBlocking() {
+				return false;
 			}
 		});
 

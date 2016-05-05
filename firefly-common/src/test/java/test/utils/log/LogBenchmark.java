@@ -18,20 +18,25 @@ public class LogBenchmark {
 		for (int i = 0; i < messageSize; i++) {
 			data.append("a");
 		}
-		String str = data.toString();
+		final String str = data.toString();
 
 		final Phaser phaser = new Phaser(threadNum + 1);
 
 		Thread[] threads = new Thread[threadNum];
-		int size = messageNum / threadNum;
+		final int size = messageNum / threadNum;
 		System.out.println("size: " + size);
 		for (int i = 0; i < threads.length; i++) {
-			threads[i] = new Thread(() -> {
-				for (int j = 0; j < size; j++) {
-					log.info(str);
+			threads[i] = new Thread(new Runnable()  {
+
+				@Override
+				public void run() {
+					for (int j = 0; j < size; j++) {
+						log.info(str);
+					}
+//					System.out.println(Thread.currentThread().getName() + " arrived");
+					phaser.arrive();
 				}
-//				System.out.println(Thread.currentThread().getName() + " arrived");
-				phaser.arrive();
+				
 			} , "test-thread-" + i);
 		}
 

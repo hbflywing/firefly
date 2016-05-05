@@ -3,8 +3,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.fireflysource</groupId>
-  <artifactId>firefly-framework</artifactId>
-  <version>4.0.1-SNAPSHOT</version>
+  <artifactId>firefly-framework-jdk7</artifactId>
+  <version>4.0.1.1</version>
   <packaging>pom</packaging>
 
 
@@ -46,33 +46,33 @@
   	<dependencies>
   		<dependency>
   			<groupId>com.fireflysource</groupId>
-  			<artifactId>firefly-db</artifactId>
-  			<version>4.0.1-SNAPSHOT</version>
+  			<artifactId>firefly-db-jdk7</artifactId>
+  			<version>4.0.1.1</version>
   		</dependency>
   		<dependency>
   			<groupId>com.fireflysource</groupId>
-  			<artifactId>firefly-slf4j</artifactId>
-  			<version>4.0.1-SNAPSHOT</version>
+  			<artifactId>firefly-slf4j-jdk7</artifactId>
+  			<version>4.0.1.1</version>
   		</dependency>
   		<dependency>
   			<groupId>com.fireflysource</groupId>
-  			<artifactId>firefly-common</artifactId>
-  			<version>4.0.1-SNAPSHOT</version>
+  			<artifactId>firefly-common-jdk7</artifactId>
+  			<version>4.0.1.1</version>
   		</dependency>
   		<dependency>
   			<groupId>com.fireflysource</groupId>
-  			<artifactId>firefly-template</artifactId>
-  			<version>4.0.1-SNAPSHOT</version>
+  			<artifactId>firefly-template-jdk7</artifactId>
+  			<version>4.0.1.1</version>
   		</dependency>
   		<dependency>
   			<groupId>com.fireflysource</groupId>
-  			<artifactId>firefly-nettool</artifactId>
-  			<version>4.0.1-SNAPSHOT</version>
+  			<artifactId>firefly-nettool-jdk7</artifactId>
+  			<version>4.0.1.1</version>
   		</dependency>
   		<dependency>
   			<groupId>com.fireflysource</groupId>
-  			<artifactId>firefly</artifactId>
-  			<version>4.0.1-SNAPSHOT</version>
+  			<artifactId>firefly-jdk7</artifactId>
+  			<version>4.0.1.1</version>
   		</dependency>
   	</dependencies>
   </dependencyManagement>
@@ -99,9 +99,9 @@
             <artifactId>maven-compiler-plugin</artifactId>
             <version>3.5.1</version>
             <configuration>
-            	<compilerArgument>-parameters</compilerArgument>
-                <source>1.8</source>
-                <target>1.8</target>
+<!--             	<compilerArgument>-parameters</compilerArgument> -->
+                <source>1.7</source>
+                <target>1.7</target>
                 <encoding>UTF-8</encoding>
             </configuration>
         </plugin>
@@ -138,7 +138,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
-            <version>2.2.1</version>
+            <version>3.0.0</version>
             <executions>
               <execution>
                 <id>attach-sources</id>
