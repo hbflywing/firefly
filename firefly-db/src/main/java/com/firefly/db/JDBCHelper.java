@@ -214,6 +214,7 @@ public class JDBCHelper {
 
 	public int update(String sql, Object... params) {
 		try (Connection connection = dataSource.getConnection()) {
+			connection.setAutoCommit(true);
 			return this.update(connection, sql, params);
 		} catch (SQLException e) {
 			log.error("update exception, sql: {}", e, sql);
@@ -223,6 +224,7 @@ public class JDBCHelper {
 
 	public int updateObject(Object object) {
 		try (Connection connection = dataSource.getConnection()) {
+			connection.setAutoCommit(true);
 			return this.updateObject(connection, object);
 		} catch (SQLException e) {
 			log.error("update exception", e);
@@ -261,6 +263,7 @@ public class JDBCHelper {
 
 	public <T> T insert(String sql, Object... params) {
 		try (Connection connection = dataSource.getConnection()) {
+			connection.setAutoCommit(true);
 			return this.insert(connection, sql, params);
 		} catch (SQLException e) {
 			log.error("insert exception, sql: {}", e, sql);
@@ -270,6 +273,7 @@ public class JDBCHelper {
 
 	public <T> T insertObject(Object object) {
 		try (Connection connection = dataSource.getConnection()) {
+			connection.setAutoCommit(true);
 			return this.insertObject(connection, object);
 		} catch (SQLException e) {
 			log.error("insert exception", e);
@@ -319,6 +323,7 @@ public class JDBCHelper {
 
 	public int deleteById(Class<?> t, Object id) {
 		try (Connection connection = dataSource.getConnection()) {
+			connection.setAutoCommit(true);
 			return this.deleteById(connection, t, id);
 		} catch (SQLException e) {
 			log.error("delete exception", e);
