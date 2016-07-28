@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.firefly.db.TransactionalJDBCHelper;
+import com.firefly.utils.function.Func1;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -53,18 +54,24 @@ public class TestTransactionalJdbcHelper {
 
 	@Test
 	public void testRollback() {
-		Long id = 1L;
-		int r = jdbcHelper.executeTransaction((helper) -> {
-			User user = new User();
-			user.setId(1L);
-			user.setName("apple");
-			int row = helper.updateObject(user);
-			Assert.assertThat(row, is(1));
+		final Long id = 1L;
 
-			User user1 = helper.queryById(User.class, id);
-			Assert.assertThat(user1.getName(), is("apple"));
-			helper.rollback();
-			return 0;
+		int r = jdbcHelper.executeTransaction(new Func1<TransactionalJDBCHelper, Integer>() {
+
+			@Override
+			public Integer call(TransactionalJDBCHelper helper) {
+				User user = new User();
+				user.setId(1L);
+				user.setName("apple");
+				int row = helper.updateObject(user);
+				Assert.assertThat(row, is(1));
+
+				User user1 = helper.queryById(User.class, id);
+				Assert.assertThat(user1.getName(), is("apple"));
+				helper.rollback();
+				return 0;
+			}
+			
 		});
 
 		Assert.assertThat(r, is(0));
@@ -74,32 +81,44 @@ public class TestTransactionalJdbcHelper {
 
 	@Test
 	public void testRollback2() {
-		int ret = jdbcHelper.executeTransaction((helper0) -> {
-			User user0 = new User();
-			user0.setId(2L);
-			user0.setName("orange");
-			int row0 = helper0.updateObject(user0);
-			Assert.assertThat(row0, is(1));
+		;
+		int ret = jdbcHelper.executeTransaction(new Func1<TransactionalJDBCHelper, Integer>() {
 
-			user0 = helper0.queryById(User.class, 2L);
-			System.out.println(user0);
-			Assert.assertThat(user0.getName(), is("orange"));
+			@Override
+			public Integer call(TransactionalJDBCHelper helper0) {
+				User user0 = new User();
+				user0.setId(2L);
+				user0.setName("orange");
+				int row0 = helper0.updateObject(user0);
+				Assert.assertThat(row0, is(1));
 
-			int r = jdbcHelper.executeTransaction((helper) -> {
-				User user1 = new User();
-				user1.setId(1L);
-				user1.setName("apple");
-				int row = helper.updateObject(user1);
-				Assert.assertThat(row, is(1));
+				user0 = helper0.queryById(User.class, 2L);
+				System.out.println(user0);
+				Assert.assertThat(user0.getName(), is("orange"));
 
-				user1 = helper.queryById(User.class, 1L);
-				System.out.println(user1);
-				Assert.assertThat(user1.getName(), is("apple"));
-				helper.rollback();
+				;
+				int r = jdbcHelper.executeTransaction(new Func1<TransactionalJDBCHelper, Integer>() {
+
+					@Override
+					public Integer call(TransactionalJDBCHelper helper) {
+						User user1 = new User();
+						user1.setId(1L);
+						user1.setName("apple");
+						int row = helper.updateObject(user1);
+						Assert.assertThat(row, is(1));
+
+						user1 = helper.queryById(User.class, 1L);
+						System.out.println(user1);
+						Assert.assertThat(user1.getName(), is("apple"));
+						helper.rollback();
+						return 0;
+					}
+					
+				});
+				Assert.assertThat(r, is(0));
 				return 0;
-			});
-			Assert.assertThat(r, is(0));
-			return 0;
+			}
+			
 		});
 
 		Assert.assertThat(ret, is(0));

@@ -1,9 +1,5 @@
 package com.firefly.codec.http2.model;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -13,16 +9,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import java.util.Properties;
 import java.util.Set;
 
 import com.firefly.utils.StringUtils;
 import com.firefly.utils.collection.ArrayTrie;
 import com.firefly.utils.collection.Trie;
 import com.firefly.utils.io.BufferUtils;
-import com.firefly.utils.lang.Loader;
-import com.firefly.utils.log.Log;
-import com.firefly.utils.log.LogFactory;
 
 /**
  * 
@@ -131,7 +123,6 @@ public class MimeTypes {
 		}
 	}
 
-	private static Log log = LogFactory.getInstance().getLog("firefly-system");
 	public final static Trie<MimeTypes.Type> CACHE = new ArrayTrie<>(512);
 	private final static Trie<ByteBuffer> TYPES = new ArrayTrie<ByteBuffer>(512);
 	private final static Map<String, String> __dftMimeMap = new HashMap<String, String>();
@@ -148,60 +139,6 @@ public class MimeTypes {
 				CACHE.put(alt, type);
 				TYPES.put(alt, type.asBuffer());
 			}
-		}
-
-		try {
-			String resourceName = "com/firefly/codec/http2/model/mime.properties";
-			URL mimeTypesUrl = Loader.getResource(resourceName);
-			if (mimeTypesUrl == null) {
-				log.warn("Missing mime-type resource: {}", resourceName);
-			} else {
-				try (InputStream in = mimeTypesUrl.openStream();
-						InputStreamReader reader = new InputStreamReader(in, StandardCharsets.UTF_8)) {
-					Properties mime = new Properties();
-					mime.load(reader);
-					mime.stringPropertyNames().stream().filter(x -> x != null).forEach(x -> __dftMimeMap
-							.put(StringUtils.asciiToLowerCase(x), normalizeMimeType(mime.getProperty(x))));
-
-					if (__dftMimeMap.size() < mime.size()) {
-						log.warn("Encountered duplicate or null mime-type extension in resource: {}", mimeTypesUrl);
-					}
-				}
-				if (__dftMimeMap.size() == 0) {
-					log.warn("Empty mime types declaration at {}", mimeTypesUrl);
-				}
-			}
-		} catch (IOException e) {
-			log.warn(e.toString());
-			log.debug("load mime exception", e);
-		}
-
-		try {
-			String resourceName = "com/firefly/codec/http2/model/encoding.properties";
-			URL mimeTypesUrl = Loader.getResource(resourceName);
-			if (mimeTypesUrl == null) {
-				log.warn("Missing mime-type resource: {}", resourceName);
-			} else {
-				try (InputStream in = mimeTypesUrl.openStream();
-						InputStreamReader reader = new InputStreamReader(in, StandardCharsets.UTF_8)) {
-					Properties encoding = new Properties();
-					encoding.load(reader);
-
-					encoding.stringPropertyNames().stream().filter(t -> t != null)
-							.forEach(t -> __encodings.put(t, encoding.getProperty(t)));
-
-					if (__encodings.size() < encoding.size()) {
-						log.warn("Encountered null or duplicate encoding type in resource: {}", mimeTypesUrl);
-					}
-				}
-
-				if (__encodings.size() == 0) {
-					log.warn("Empty mime types declaration at {}", mimeTypesUrl);
-				}
-			}
-		} catch (IOException e) {
-			log.warn(e.toString());
-			log.debug("load mime exception", e);
 		}
 	}
 

@@ -53,24 +53,36 @@ public class QuotedQualityCSV implements Iterable<String>
      */
     public QuotedQualityCSV()
     {
-        this((s) -> s.length());
+        this(new Function<String, Integer>() {
+
+			@Override
+			public Integer apply(String s) {
+				return s.length();
+			}
+    		
+    	});
     }
 
     /**
      * Sorts values with equal quality according to given order.
      */
-    public QuotedQualityCSV(String[] serverPreferredValueOrder)
+    public QuotedQualityCSV(final String[] serverPreferredValueOrder)
     {
-        this((s) -> {
-            for (int i=0;i<serverPreferredValueOrder.length;++i)
-                if (serverPreferredValueOrder[i].equals(s))
-                    return serverPreferredValueOrder.length-i;
+        this(new Function<String, Integer>() {
 
-            if ("*".equals(s))
-                return serverPreferredValueOrder.length;
+			@Override
+			public Integer apply(String s) {
+				for (int i=0;i<serverPreferredValueOrder.length;++i)
+	                if (serverPreferredValueOrder[i].equals(s))
+	                    return serverPreferredValueOrder.length-i;
 
-            return MIN_VALUE;
-        });
+	            if ("*".equals(s))
+	                return serverPreferredValueOrder.length;
+
+	            return MIN_VALUE;
+			}
+    		
+    	});
     }
 
     /**

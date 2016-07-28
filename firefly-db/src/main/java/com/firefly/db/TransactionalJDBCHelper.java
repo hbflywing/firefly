@@ -35,110 +35,185 @@ public class TransactionalJDBCHelper {
 		return jdbcHelper;
 	}
 
-	public <T> T queryForSingleColumn(String sql, Object... params) {
-		return _executeTransaction((connection, helper) -> {
-			return helper.queryForSingleColumn(connection, sql, params);
-		});
-	}
+	public <T> T queryForSingleColumn(final String sql, final Object... params) {
+		return _executeTransaction(new Func2<Connection, JDBCHelper, T>() {
 
-	public <T> T queryForObject(String sql, Class<T> t, Object... params) {
-		return _executeTransaction((connection, helper) -> {
-			return helper.queryForObject(connection, sql, t, params);
-		});
-	}
-
-	public <T> T queryForObject(String sql, Class<T> t, BeanProcessor beanProcessor, Object... params) {
-		return _executeTransaction((connection, helper) -> {
-			return helper.queryForObject(connection, sql, t, beanProcessor, params);
-		});
-	}
-
-	public <T> T queryById(Class<T> t, Object id) {
-		return _executeTransaction((connection, helper) -> {
-			return helper.queryById(connection, t, id);
-		});
-	}
-
-	public <K, V> Map<K, V> queryForBeanMap(String sql, Class<V> t, Object... params) {
-		return _executeTransaction((connection, helper) -> {
-			return helper.queryForBeanMap(connection, sql, t, params);
-		});
-	}
-
-	public <K, V> Map<K, V> queryForBeanMap(String sql, Class<V> t, BeanProcessor beanProcessor, Object... params) {
-		return _executeTransaction((connection, helper) -> {
-			String columnName = helper.getDefaultBeanProcessor().getIdColumnName(t);
-			Assert.notNull(columnName);
-
-			return helper.queryForBeanMap(connection, sql, t, columnName, beanProcessor, params);
-		});
-	}
-
-	public <T> List<T> queryForList(String sql, Class<T> t, Object... params) {
-		return _executeTransaction((connection, helper) -> {
-			return helper.queryForList(connection, sql, t, params);
-		});
-	}
-
-	public <T> List<T> queryForList(String sql, Class<T> t, BeanProcessor beanProcessor, Object... params) {
-		return _executeTransaction((connection, helper) -> {
-			return helper.queryForList(connection, sql, t, beanProcessor, params);
-		});
-	}
-
-	public int update(String sql, Object... params) {
-		return _executeTransaction((connection, helper) -> {
-			return helper.update(connection, sql, params);
-		});
-	}
-
-	public int updateObject(Object object) {
-		return _executeTransaction((connection, helper) -> {
-			return helper.updateObject(connection, object);
-		});
-	}
-
-	public <T> T insert(String sql, Object... params) {
-		return _executeTransaction((connection, helper) -> {
-			return helper.insert(connection, sql, params);
-		});
-	}
-
-	public <T> T insertObject(Object object) {
-		return _executeTransaction((connection, helper) -> {
-			return helper.insertObject(connection, object);
-		});
-	}
-
-	public int deleteById(Class<?> t, Object id) {
-		return _executeTransaction((connection, helper) -> {
-			return helper.deleteById(connection, t, id);
-		});
-	}
-
-	public int[] batch(String sql, Object[][] params) {
-		return _executeTransaction((connection, helper) -> {
-			int[] ret = null;
-			try {
-				ret = helper.getRunner().batch(connection, sql, params);
-			} catch (Exception e) {
-				rollback();
-				log.error("batch exception", e);
+			@Override
+			public T call(Connection connection, JDBCHelper helper) {
+				return helper.queryForSingleColumn(connection, sql, params);
 			}
-			return ret;
+			
 		});
 	}
 
-	public <T> T insertBatch(String sql, ResultSetHandler<T> rsh, Object[][] params) {
-		return _executeTransaction((connection, helper) -> {
-			T ret = null;
-			try {
-				ret = helper.getRunner().insertBatch(connection, sql, rsh, params);
-			} catch (Exception e) {
-				rollback();
-				log.error("insert batch exception", e);
+	public <T> T queryForObject(final String sql, final Class<T> t, final Object... params) {
+		return _executeTransaction(new Func2<Connection, JDBCHelper, T>() {
+
+			@Override
+			public T call(Connection connection, JDBCHelper helper) {
+				return helper.queryForObject(connection, sql, t, params);
 			}
-			return ret;
+			
+		});
+	}
+
+	public <T> T queryForObject(final String sql, final Class<T> t, final BeanProcessor beanProcessor, final Object... params) {
+		return _executeTransaction(new Func2<Connection, JDBCHelper, T>() {
+
+			@Override
+			public T call(Connection connection, JDBCHelper helper) {
+				return helper.queryForObject(connection, sql, t, beanProcessor, params);
+			}
+			
+		});
+	}
+
+	public <T> T queryById(final Class<T> t, final Object id) {
+		return _executeTransaction(new Func2<Connection, JDBCHelper, T>() {
+
+			@Override
+			public T call(Connection connection, JDBCHelper helper) {
+				return helper.queryById(connection, t, id);
+			}
+			
+		});
+	}
+
+	public <K, V> Map<K, V> queryForBeanMap(final String sql, final Class<V> t, final Object... params) {
+		return _executeTransaction(new Func2<Connection, JDBCHelper, Map<K, V>>() {
+
+			@Override
+			public Map<K, V> call(Connection connection, JDBCHelper helper) {
+				return helper.queryForBeanMap(connection, sql, t, params);
+			}
+			
+		});
+	}
+
+	public <K, V> Map<K, V> queryForBeanMap(final String sql, final Class<V> t, final BeanProcessor beanProcessor, final Object... params) {
+		return _executeTransaction(new Func2<Connection, JDBCHelper, Map<K, V>>() {
+
+			@Override
+			public Map<K, V> call(Connection connection, JDBCHelper helper) {
+				String columnName = helper.getDefaultBeanProcessor().getIdColumnName(t);
+				Assert.notNull(columnName);
+
+				return helper.queryForBeanMap(connection, sql, t, columnName, beanProcessor, params);
+			}
+			
+		});
+	}
+
+	public <T> List<T> queryForList(final String sql, final Class<T> t, final Object... params) {
+		return _executeTransaction(new Func2<Connection, JDBCHelper, List<T>>() {
+
+			@Override
+			public List<T> call(Connection connection, JDBCHelper helper) {
+				return helper.queryForList(connection, sql, t, params);
+			}
+			
+		});
+	}
+
+	public <T> List<T> queryForList(final String sql, final Class<T> t, final BeanProcessor beanProcessor, final Object... params) {
+		return _executeTransaction(new Func2<Connection, JDBCHelper, List<T>>() {
+
+			@Override
+			public List<T> call(Connection connection, JDBCHelper helper) {
+				return helper.queryForList(connection, sql, t, beanProcessor, params);
+			}
+			
+		});
+	}
+
+	public int update(final String sql, final Object... params) {
+		return _executeTransaction(new Func2<Connection, JDBCHelper, Integer>() {
+
+			@Override
+			public Integer call(Connection connection, JDBCHelper helper) {
+				return helper.update(connection, sql, params);
+			}
+			
+		});
+	}
+
+	public int updateObject(final Object object) {
+		return _executeTransaction(new Func2<Connection, JDBCHelper, Integer>() {
+
+			@Override
+			public Integer call(Connection connection, JDBCHelper helper) {
+				return helper.updateObject(connection, object);
+			}
+			
+		});
+	}
+
+	public <T> T insert(final String sql, final Object... params) {
+		return _executeTransaction(new Func2<Connection, JDBCHelper, T>() {
+
+			@Override
+			public T call(Connection connection, JDBCHelper helper) {
+				return helper.insert(connection, sql, params);
+			}
+			
+		});
+	}
+
+	public <T> T insertObject(final Object object) {
+		return _executeTransaction(new Func2<Connection, JDBCHelper, T>() {
+
+			@Override
+			public T call(Connection connection, JDBCHelper helper) {
+				return helper.insertObject(connection, object);
+			}
+			
+		});
+	}
+
+	public int deleteById(final Class<?> t, final Object id) {
+		return _executeTransaction(new Func2<Connection, JDBCHelper, Integer>() {
+
+			@Override
+			public Integer call(Connection connection, JDBCHelper helper) {
+				return helper.deleteById(connection, t, id);
+			}
+			
+		});
+	}
+
+	public int[] batch(final String sql, final Object[][] params) {
+		return _executeTransaction(new Func2<Connection, JDBCHelper, int[]>() {
+
+			@Override
+			public int[] call(Connection connection, JDBCHelper helper) {
+				int[] ret = null;
+				try {
+					ret = helper.getRunner().batch(connection, sql, params);
+				} catch (Exception e) {
+					rollback();
+					log.error("batch exception", e);
+				}
+				return ret;
+			}
+			
+		});
+	}
+
+	public <T> T insertBatch(final String sql, final ResultSetHandler<T> rsh, final Object[][] params) {
+		return _executeTransaction(new Func2<Connection, JDBCHelper, T>() {
+
+			@Override
+			public T call(Connection connection, JDBCHelper helper) {
+				T ret = null;
+				try {
+					ret = helper.getRunner().insertBatch(connection, sql, rsh, params);
+				} catch (Exception e) {
+					rollback();
+					log.error("insert batch exception", e);
+				}
+				return ret;
+			}
+			
 		});
 	}
 

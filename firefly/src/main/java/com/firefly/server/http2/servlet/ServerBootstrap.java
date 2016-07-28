@@ -73,10 +73,14 @@ public class ServerBootstrap extends AbstractLifeCycle {
 		String jvmName = ManagementFactory.getRuntimeMXBean().getName();
 		log.info("the jvm name is {}", jvmName);
 		
-		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-			log.info("the server will be stopped");
-			this.stop();
-		}));
+		;
+		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				log.info("the server will be stopped");
+				ServerBootstrap.this.stop();
+			}}));
 		
 		log.info("the server start spends time in {} ms", System.currentTimeMillis() - createTime);
 	}

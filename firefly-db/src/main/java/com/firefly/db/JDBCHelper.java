@@ -31,8 +31,8 @@ public class JDBCHelper {
 	private final static Log log = LogFactory.getInstance().getLog("firefly-system");
 
 	private final DataSource dataSource;
-	private QueryRunner runner;
-	private DefaultBeanProcessor defaultBeanProcessor;
+	private final QueryRunner runner;
+	private final DefaultBeanProcessor defaultBeanProcessor;
 
 	public JDBCHelper(DataSource dataSource) {
 		this(dataSource, getQueryRunner(dataSource, log.isDebugEnabled() || log.isTraceEnabled()),
@@ -53,7 +53,7 @@ public class JDBCHelper {
 		if (debugMode) {
 			try {
 				QueryRunner queryRunner = new QueryRunner(dataSource);
-				this.runner = (QueryRunner) ClassProxyFactoryUsingJavassist.INSTANCE.createProxy(queryRunner,
+				return (QueryRunner) ClassProxyFactoryUsingJavassist.INSTANCE.createProxy(queryRunner,
 						new ClassProxy() {
 							@Override
 							public Object intercept(MethodProxy handler, Object originalInstance, Object[] args) {
